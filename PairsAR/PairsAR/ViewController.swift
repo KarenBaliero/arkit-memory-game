@@ -46,8 +46,9 @@ class ViewController: UIViewController {
         var cancellable: AnyCancellable? = nil
         
         cancellable = ModelEntity.loadModelAsync(named: "01")
+            .append(ModelEntity.loadModelAsync(named: "02"))
             .append(ModelEntity.loadModelAsync(named: "03"))
-            .append(ModelEntity.loadModelAsync(named: "04"))
+            .append(ModelEntity.loadModelAsync(named: "09"))
             .append(ModelEntity.loadModelAsync(named: "05"))
             .append(ModelEntity.loadModelAsync(named: "06"))
             .append(ModelEntity.loadModelAsync(named: "07"))
