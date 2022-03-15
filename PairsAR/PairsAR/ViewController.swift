@@ -16,9 +16,13 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        ModelComponent.registerComponent()
+        
         let anchor = AnchorEntity(plane: .horizontal, minimumBounds: [0.2, 0.2])
         arView.scene.addAnchor(anchor)
-        
+        arView.debugOptions = [
+                               
+                               .showFeaturePoints]
         var cards: [Entity] = []
         for _ in 1...16 {
             let box = MeshResource.generateBox(width: 0.04, height: 0.002, depth: 0.04) // cria o volume
@@ -59,19 +63,38 @@ class ViewController: UIViewController {
                 cancellable?.cancel()
             }, receiveValue: {entities in
                 var objects: [ModelEntity] = []
-                for entity in entities {
-                    entity.setScale(SIMD3<Float>(0.002, 0.002, 0.002), relativeTo: anchor)
+                for (index,entity) in entities.enumerated() {
+                    entity.setScale([0.002,0.002,0.002], relativeTo: anchor)
+                    
+                    entity.name = String(index)
+                    
+                    //como nao vamos mais rotacionar precisa mudar a posicao inicial do modelo
+                    let box = entity.visualBounds(relativeTo: cards[index])
+                    let width = box.max.x - box.min.x
+                    let height = box.max.y - box.min.y
+                    
+                    print(box,entity.name)
+                    entity.position =  [0,height,0]
+                    //aqui tem q rotacionando pq rotaciona o card embaixo
+                    entity.orientation =  simd_quatf(angle: .pi, axis: [1, 0, 0])
+                    print(entity.visualBounds(relativeTo: cards[index]).center)
                     entity.generateCollisionShapes(recursive: true)
+                    entity.components[ModelComponent.self] = ModelComponent()
+                    entity.components[ModelComponent.self]?.width = width
+                    entity.components[ModelComponent.self]?.height = height
+                    
                     for _ in 1...2 {
-                        objects.append(entity.clone(recursive: true))
+                        var clone = entity.clone(recursive: true)
+                        
+                        objects.append(clone)
                     }
                 }
                 objects.shuffle()
                 //coloquei nome pra nao me perder
                 for (index, object) in objects.enumerated() {
-                    object.name = String(index)
-                    cards[index].name = "card" + String(index)
                     
+                    
+                    cards[index].name = "card" + String(index)
                     cards[index].addChild(object)
                     cards[index].transform.rotation = simd_quatf(angle: .pi, axis: [1, 0, 0])
                 }
@@ -84,21 +107,61 @@ class ViewController: UIViewController {
         let tapLocation = sender.location(in: arView)
         if let card = arView.entity(at: tapLocation) {
             
-            if card.transform.rotation.angle == .pi {
-                flipUpCard(card: card)
-            } else {
-                flipDownCard(card: card)
-            }
-            print(card.children)
-            guard let model = card.children.first else{return}
-            
-//            if card.position.y > (model.position.y) {
-//
-//                moveDownModel(card: card)
-//            } else {
-//
-//                moveUpModel(card: card)
+            if( card.name == "") {return}
+            print(card.name)
+//            if(card.name.contains("card") ){
+//                if card.transform.rotation.angle == .pi {
+//                    flipDownCard(card: card)
+//                } else {
+//                    flipUpCard(card: card)
+//                }
+//            }else {
+//                guard let newcard = card.parent else{return}
+//                if newcard.transform.rotation.angle == .pi {
+//                    flipDownCard(card: newcard)
+//                } else {
+//                    flipUpCard(card: newcard)
+//                }
 //            }
+            
+            
+            
+            if(card.name.contains("card") ){
+                guard let model = card.children.first else{return}
+                print("card", card.position.y, model.position.y)
+                if let modelComponent = model.components[ModelComponent.self] as? ModelComponent {
+                    
+                    if modelComponent.revealed {
+                        moveDownModel(entity: model)
+                    }else{
+                        moveUpModel(entity: model)
+                    }
+                }
+              
+            }else {
+                //neste caso o card já é o model
+                guard let newcard = card.parent else{return}
+                
+                print("model", newcard.position.y, card.position.y)
+                if let modelComponent = card.components[ModelComponent.self] as? ModelComponent {
+                    
+                    if modelComponent.revealed {
+                        moveDownModel(entity: card)
+                    }else{
+                        moveUpModel(entity: card)
+                    }
+                }
+//                if newcard.position.y > (card.position.y) {
+//                    print("desce")
+//                    moveDownModel(entity: card)
+//                } else {
+//
+//                    moveUpModel(entity: card)
+//                }
+            }
+            
+            
+     
         }
     }
     
@@ -117,31 +180,39 @@ class ViewController: UIViewController {
     //problema a se explorar são os movimentos relativos, tb como mover o modelo ao inves do card, tb como descobrir o tamanho para mover o necessário, rotacionar o objeto antes de subir (?), 2 animaçoes juntas
     
     
-    func moveUpModel(card: Entity){
-        guard let model = card.children.first else{return}
-        var modelTransform = model.transform
-        modelTransform.rotation = simd_quatf(angle: .pi, axis: [1, 0, 0])
-        model.move(to: modelTransform, relativeTo: model)
+    func moveUpModel(entity: Entity){
+        print(entity.visualBounds(relativeTo: nil).center)
+        var modelTransform = entity.transform
+        if let modelComponent = entity.components[ModelComponent.self] as? ModelComponent {
+            let heigh = modelComponent.height //somar mais um tanto pra mostar 0.05
+            print(heigh)
+            let center = entity.visualBounds(relativeTo: entity.parent).center
+            entity.components[ModelComponent.self]?.revealed = true
+            print(center, center.y - heigh)
+            modelTransform.translation = [0, center.y - heigh/2, 0]
+            entity.move(to: modelTransform, relativeTo: entity.parent, duration: 0.25, timingFunction: .easeInOut)
+            
+        }
         
-        let boxSize = model.visualBounds(relativeTo: nil).boundingRadius //somar mais um tanto pra mostar 0.05
-        modelTransform.translation = SIMD3<Float>(0, -boxSize ,0)
-        model.move(to: modelTransform, relativeTo: card, duration: 0.25, timingFunction: .easeInOut)
         
     }
     
     
     
-    func moveDownModel(card: Entity){
-        guard let model = card.children.first else{return}
-        var modelTransform = model.transform
+    func moveDownModel(entity: Entity){
+        print(entity.visualBounds(relativeTo: nil).center)
+        var modelTransform = entity.transform
+        if let modelComponent = entity.components[ModelComponent.self] as? ModelComponent {
+            let heigh = modelComponent.height
+            print(heigh)
+            let center = entity.visualBounds(relativeTo: entity.parent).center
+            print(center, heigh + center.y)
+            entity.components[ModelComponent.self]?.revealed = false
+            modelTransform.translation = [0, heigh/2 - center.y , 0]
+            entity.move(to: modelTransform, relativeTo: entity.parent, duration: 0.25, timingFunction: .easeInOut)
         
-        let boxSize = model.visualBounds(relativeTo: nil).boundingRadius
-        modelTransform.translation = SIMD3<Float>(0, boxSize ,0)
-        model.move(to: modelTransform, relativeTo: card, duration: 0.25, timingFunction: .easeInOut)
+        }
         
-        
-        modelTransform.rotation = simd_quatf(angle: 0, axis: [1, 0, 0])
-        model.move(to: modelTransform, relativeTo: model)
     }
     
 }
