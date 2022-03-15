@@ -41,6 +41,7 @@ class ViewController: UIViewController {
         let occlusionBoxMesh = MeshResource.generateBox(size: boxSize)
         let occlusionBox = ModelEntity(mesh: occlusionBoxMesh, materials: [OcclusionMaterial()])
         occlusionBox.position.y = -boxSize/2
+        occlusionBox.name = "occlusion"
         anchor.addChild(occlusionBox)
         
         var cancellable: AnyCancellable? = nil
@@ -66,8 +67,11 @@ class ViewController: UIViewController {
                     }
                 }
                 objects.shuffle()
-                
+                //coloquei nome pra nao me perder
                 for (index, object) in objects.enumerated() {
+                    object.name = String(index)
+                    cards[index].name = "card" + String(index)
+                    
                     cards[index].addChild(object)
                     cards[index].transform.rotation = simd_quatf(angle: .pi, axis: [1, 0, 0])
                 }
@@ -79,17 +83,65 @@ class ViewController: UIViewController {
     @IBAction func onTap(_ sender: UITapGestureRecognizer) {
         let tapLocation = sender.location(in: arView)
         if let card = arView.entity(at: tapLocation) {
+            
             if card.transform.rotation.angle == .pi {
-                var flipDownTransform = card.transform
-                flipDownTransform.rotation = simd_quatf(angle: 0, axis: [1, 0, 0])
-                card.move(to: flipDownTransform, relativeTo: card.parent, duration: 0.25, timingFunction: .easeInOut)
+                flipUpCard(card: card)
             } else {
-                var flipUpTransform = card.transform
-                flipUpTransform.rotation = simd_quatf(angle: .pi, axis: [1, 0, 0])
-                
-                card.move(to: flipUpTransform, relativeTo: card.parent, duration: 0.25, timingFunction: .easeInOut)
+                flipDownCard(card: card)
             }
+            print(card.children)
+            guard let model = card.children.first else{return}
+            
+//            if card.position.y > (model.position.y) {
+//
+//                moveDownModel(card: card)
+//            } else {
+//
+//                moveUpModel(card: card)
+//            }
         }
+    }
+    
+    func flipUpCard(card: Entity){
+        var flipUpTransform = card.transform
+        flipUpTransform.rotation = simd_quatf(angle: .pi, axis: [1, 0, 0])
+        card.move(to: flipUpTransform, relativeTo: card.parent, duration: 0.25, timingFunction: .easeInOut)
+    }
+    func flipDownCard(card: Entity){
+        var flipDownTransform = card.transform
+        flipDownTransform.rotation = simd_quatf(angle: 0, axis: [1, 0, 0])
+        card.move(to: flipDownTransform, relativeTo: card.parent, duration: 0.25, timingFunction: .easeInOut)
+    }
+    
+    
+    //problema a se explorar são os movimentos relativos, tb como mover o modelo ao inves do card, tb como descobrir o tamanho para mover o necessário, rotacionar o objeto antes de subir (?), 2 animaçoes juntas
+    
+    
+    func moveUpModel(card: Entity){
+        guard let model = card.children.first else{return}
+        var modelTransform = model.transform
+        modelTransform.rotation = simd_quatf(angle: .pi, axis: [1, 0, 0])
+        model.move(to: modelTransform, relativeTo: model)
+        
+        let boxSize = model.visualBounds(relativeTo: nil).boundingRadius //somar mais um tanto pra mostar 0.05
+        modelTransform.translation = SIMD3<Float>(0, -boxSize ,0)
+        model.move(to: modelTransform, relativeTo: card, duration: 0.25, timingFunction: .easeInOut)
+        
+    }
+    
+    
+    
+    func moveDownModel(card: Entity){
+        guard let model = card.children.first else{return}
+        var modelTransform = model.transform
+        
+        let boxSize = model.visualBounds(relativeTo: nil).boundingRadius
+        modelTransform.translation = SIMD3<Float>(0, boxSize ,0)
+        model.move(to: modelTransform, relativeTo: card, duration: 0.25, timingFunction: .easeInOut)
+        
+        
+        modelTransform.rotation = simd_quatf(angle: 0, axis: [1, 0, 0])
+        model.move(to: modelTransform, relativeTo: model)
     }
     
 }
