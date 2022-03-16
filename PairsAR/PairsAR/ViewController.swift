@@ -16,7 +16,6 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        ModelComponent.registerComponent()
         
         let anchor = AnchorEntity(plane: .horizontal, minimumBounds: [0.2, 0.2])
         arView.scene.addAnchor(anchor)
@@ -67,10 +66,9 @@ class ViewController: UIViewController {
                     entity.setScale([0.002,0.002,0.002], relativeTo: anchor)
                     entity.name = String(index)
                     entity.generateCollisionShapes(recursive: true)
-                    entity.components[ModelComponent.self] = ModelComponent()
                     
                     for _ in 1...2 {
-                        var clone = entity.clone(recursive: true)
+                        let clone = entity.clone(recursive: true)
                         objects.append(clone)
                     }
                 }
@@ -84,58 +82,32 @@ class ViewController: UIViewController {
                 cancellable?.cancel()
             })
     }
-    
-    
     @IBAction func onTap(_ sender: UITapGestureRecognizer) {
         let tapLocation = sender.location(in: arView)
         if let card = arView.entity(at: tapLocation) {
-            if( card.name == "") {return}
-            if(card.name.contains("card") ){
-                //tocou no card
-                guard let model = card.children.first else{return}
-                
-                if let modelComponent = model.components[ModelComponent.self] as? ModelComponent {
-                  
-                    if modelComponent.revealed {
-                        
-                        flipDownCard(card: model)
-                    }else{
-                        
-                        flipUpCard(card: model)
-                    }
-                }
-                
-            }else {
-                //tocou no model
-                guard let newcard = card.parent else{return}
-                
-                if let modelComponent = card.components[ModelComponent.self] as? ModelComponent {
-                    
-                    if modelComponent.revealed {
-                        flipDownCard(card: newcard)
-                    }else{
-                        flipUpCard(card: newcard)
-                    }
-                }
+            
+            if card.transform.rotation.angle == .pi {
+                flipDownCard(card: card)
+            } else {
+                flipUpCard(card: card)
             }
-            
-            
-            
         }
     }
     
+
     func flipUpCard(card: Entity){
         var flipUpTransform = card.transform
         flipUpTransform.rotation = simd_quatf(angle: .pi, axis: [1, 0, 0])
-        card.components[ModelComponent.self]?.revealed = true
         card.move(to: flipUpTransform, relativeTo: card.parent, duration: 0.25, timingFunction: .easeInOut)
     }
     func flipDownCard(card: Entity){
         var flipDownTransform = card.transform
         flipDownTransform.rotation = simd_quatf(angle: 0, axis: [1, 0, 0])
-        card.components[ModelComponent.self]?.revealed = false
         card.move(to: flipDownTransform, relativeTo: card.parent, duration: 0.25, timingFunction: .easeInOut)
     }
     
     
 }
+
+
+
