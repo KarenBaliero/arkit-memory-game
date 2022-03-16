@@ -8,6 +8,7 @@
 import UIKit
 import RealityKit
 import Combine
+import ARKit
 
 class ViewController: UIViewController {
     
@@ -16,9 +17,21 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        // Face Anchor
+        // Verify if your device supports FaceTrackingConfiguration (front camera) and then run the config
+        guard ARFaceTrackingConfiguration.isSupported else { return }
+        let configuration = ARFaceTrackingConfiguration()
+        configuration.isLightEstimationEnabled = true
+
+        arView.session.run(configuration, options: [.resetTracking, .removeExistingAnchors])
+
+        // Add your face anchors to the scene
         
-        let anchor = AnchorEntity(plane: .horizontal, minimumBounds: [0.2, 0.2])
+        let anchor = AnchorEntity(.face) /// muda o tipo de ancoragem
         arView.scene.addAnchor(anchor)
+        
+        //
+        
 
         var cards: [Entity] = []
         for _ in 1...16 {
@@ -42,6 +55,7 @@ class ViewController: UIViewController {
         let occlusionBoxMesh = MeshResource.generateBox(size: boxSize)
         let occlusionBox = ModelEntity(mesh: occlusionBoxMesh, materials: [OcclusionMaterial()])
         occlusionBox.position.y = -boxSize/2
+
         occlusionBox.name = "occlusion"
         anchor.addChild(occlusionBox)
         
