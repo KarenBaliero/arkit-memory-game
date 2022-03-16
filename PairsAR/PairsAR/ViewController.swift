@@ -17,18 +17,21 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        // Indicate to use the FaceTrackingConfiguration (front camera)
-                guard ARFaceTrackingConfiguration.isSupported else { return }
-                let configuration = ARFaceTrackingConfiguration()
-                configuration.isLightEstimationEnabled = true
+        // Face Anchor
+        // Verify if your device supports FaceTrackingConfiguration (front camera) and then run the config
+        guard ARFaceTrackingConfiguration.isSupported else { return }
+        let configuration = ARFaceTrackingConfiguration()
+        configuration.isLightEstimationEnabled = true
 
-                arView.session.run(configuration, options: [.resetTracking, .removeExistingAnchors])
+        arView.session.run(configuration, options: [.resetTracking, .removeExistingAnchors])
 
-        // Now, append your anchors to the scene
+        // Add your face anchors to the scene
         
         let anchor = AnchorEntity(.face) /// muda o tipo de ancoragem
         arView.scene.addAnchor(anchor)
-                
+        
+        //
+        
         var cards: [Entity] = []
         for _ in 1...16 {
             let box = MeshResource.generateBox(width: 0.04, height: 0.002, depth: 0.04) // cria o volume
@@ -51,7 +54,7 @@ class ViewController: UIViewController {
         let occlusionBoxMesh = MeshResource.generateBox(size: boxSize)
         let occlusionBox = ModelEntity(mesh: occlusionBoxMesh, materials: [OcclusionMaterial()])
         occlusionBox.position.y = -boxSize/2
-        anchor.addChild(occlusionBox)
+            anchor.addChild(occlusionBox)
         
         var cancellable: AnyCancellable? = nil
         
