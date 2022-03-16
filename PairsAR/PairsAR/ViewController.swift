@@ -89,10 +89,8 @@ class ViewController: UIViewController {
                     }
                 }
                 objects.shuffle()
-                //coloquei nome pra nao me perder
+                
                 for (index, object) in objects.enumerated() {
-                    
-                    
                     cards[index].name = "card" + String(index)
                     cards[index].addChild(object)
                     cards[index].transform.rotation = simd_quatf(angle: .pi, axis: [1, 0, 0])
@@ -105,9 +103,8 @@ class ViewController: UIViewController {
     @IBAction func onTap(_ sender: UITapGestureRecognizer) {
         let tapLocation = sender.location(in: arView)
         if let card = arView.entity(at: tapLocation) {
-            
             if( card.name == "") {return}
-            print(card.name)
+            
 //            if(card.name.contains("card") ){
 //                if card.transform.rotation.angle == .pi {
 //                    flipDownCard(card: card)
@@ -122,8 +119,6 @@ class ViewController: UIViewController {
 //                    flipUpCard(card: newcard)
 //                }
 //            }
-            
-            
             
             if(card.name.contains("card") ){
                 guard let model = card.children.first else{return}
@@ -150,13 +145,6 @@ class ViewController: UIViewController {
                         moveUpModel(entity: card)
                     }
                 }
-//                if newcard.position.y > (card.position.y) {
-//                    print("desce")
-//                    moveDownModel(entity: card)
-//                } else {
-//
-//                    moveUpModel(entity: card)
-//                }
             }
             
             
