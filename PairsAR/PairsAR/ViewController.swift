@@ -20,9 +20,8 @@ class ViewController: UIViewController {
         
         let anchor = AnchorEntity(plane: .horizontal, minimumBounds: [0.2, 0.2])
         arView.scene.addAnchor(anchor)
-        arView.debugOptions = [
-                               
-                               .showFeaturePoints]
+        
+        
         var cards: [Entity] = []
         for _ in 1...16 {
             let box = MeshResource.generateBox(width: 0.04, height: 0.002, depth: 0.04) // cria o volume
