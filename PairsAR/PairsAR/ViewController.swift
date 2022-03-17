@@ -9,15 +9,22 @@ import UIKit
 import RealityKit
 import Combine
 import ARKit
+import SceneKit
+import SpriteKit
 
-class ViewController: UIViewController {
+class ViewController: UIViewController, ARSessionDelegate {
     
     @IBOutlet var arView: ARView!
+    var anchor: AnchorEntity? = nil
+    var cards: [Entity] = []
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        // Face Anchor
+        arView.session.delegate = self
+        
+        /*
+         //Face Anchor
         // Verify if your device supports FaceTrackingConfiguration (front camera) and then run the config
         guard ARFaceTrackingConfiguration.isSupported else { return }
         let configuration = ARFaceTrackingConfiguration()
@@ -27,19 +34,48 @@ class ViewController: UIViewController {
 
         // Add your face anchors to the scene
         
-        let anchor = AnchorEntity(.face) /// muda o tipo de ancoragem
-        arView.scene.addAnchor(anchor)
+        self.anchor = AnchorEntity(.face) /// muda o tipo de ancoragem
+        arView.scene.addAnchor(anchor!)
+         buildBoard()
+        */
         
-        //
         
+        
+         
+        //Horizontal Anchor
+         
+         self.anchor = AnchorEntity(plane: .horizontal)
+         arView.scene.addAnchor(anchor!)
+         buildBoard()
+         
+        
+        
+        /*
+         //Object Anchor
+         
+         let configuration = ARWorldTrackingConfiguration()
+         guard let referenceObjects = ARReferenceObject.referenceObjects(inGroupNamed: "scan", bundle: Bundle.main) else {
+             fatalError("Missing expected asset catalog resources.")
+         }
+         configuration.detectionObjects = referenceObjects
 
-        var cards: [Entity] = []
+         arView.session.run(configuration)
+         
+         */
+    }
+    
+    func buildBoard(){
+        
+        guard let anchor = self.anchor else{
+             return
+        }
+        
         for _ in 1...16 {
             let box = MeshResource.generateBox(width: 0.04, height: 0.002, depth: 0.04) // cria o volume
             let metalMaterial = SimpleMaterial(color: .gray, isMetallic: true) //ficar metalico
             let model = ModelEntity(mesh: box, materials: [metalMaterial]) //cria entidade
             
-            model.generateCollisionShapes(recursive: true) //poder tocar
+            model.generateCollisionShapes(recursive: true) //cria o shape
             cards.append(model)
         }
         
@@ -73,11 +109,11 @@ class ViewController: UIViewController {
             .sink(receiveCompletion: {error in
                 print("Error: \(error)")
                 cancellable?.cancel()
-            }, receiveValue: {entities in
+            }, receiveValue: { [self]entities in
                 var objects: [ModelEntity] = []
                 for (index,entity) in entities.enumerated() {
                     
-                    entity.setScale([0.002,0.002,0.002], relativeTo: anchor)
+                    entity.setScale([0.002,0.002,0.002], relativeTo: self.anchor)
                     entity.name = String(index)
                     entity.generateCollisionShapes(recursive: true)
                     
@@ -89,13 +125,14 @@ class ViewController: UIViewController {
                 objects.shuffle()
                 
                 for (index, object) in objects.enumerated() {
-                    cards[index].name = "card" + String(index)
-                    cards[index].addChild(object)
-                    cards[index].transform.rotation = simd_quatf(angle: .pi, axis: [1, 0, 0])
-                }
+                    self.cards[index].name = "card" + String(index)
+                    self.cards[index].addChild(object)
+                    self.cards[index].transform.rotation = simd_quatf(angle: .pi, axis: [1, 0, 0])
+            }
                 cancellable?.cancel()
-            })
+        })
     }
+    
     @IBAction func onTap(_ sender: UITapGestureRecognizer) {
         let tapLocation = sender.location(in: arView)
         if let card = arView.entity(at: tapLocation) {
@@ -107,19 +144,29 @@ class ViewController: UIViewController {
             }
         }
     }
-    
 
     func flipUpCard(card: Entity){
         var flipUpTransform = card.transform
         flipUpTransform.rotation = simd_quatf(angle: .pi, axis: [1, 0, 0])
         card.move(to: flipUpTransform, relativeTo: card.parent, duration: 0.25, timingFunction: .easeInOut)
     }
+    
     func flipDownCard(card: Entity){
         var flipDownTransform = card.transform
         flipDownTransform.rotation = simd_quatf(angle: 0, axis: [1, 0, 0])
         card.move(to: flipDownTransform, relativeTo: card.parent, duration: 0.25, timingFunction: .easeInOut)
     }
     
+    /*
+    func session(_ session: ARSession, didAdd anchors: [ARAnchor]) {
+        
+        if let newAnchor = anchors.last{
+            self.anchor = AnchorEntity(anchor: newAnchor)
+            arView.scene.addAnchor(self.anchor!)
+            buildBoard()
+        }
+    }
+    */
     
 }
 
