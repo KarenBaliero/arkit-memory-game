@@ -36,12 +36,20 @@ class ViewController: UIViewController {
             card.position = [x*0.1, 0, z*0.1]
             anchor.addChild(card)
         }
-
-        let boxSize: Float = 0.7
+        
+        let material = OcclusionMaterial()
+        
+        let planeMesh = MeshResource.generatePlane(width: 300, depth: 300)
+        let occlusionPlane = ModelEntity(mesh: planeMesh, materials: [material])
+        occlusionPlane.position.y = -1
+        //anchor.addChild(occlusionPlane)
+        
+        let boxSize: Float = -0.7
         let occlusionBoxMesh = MeshResource.generateBox(size: boxSize)
-        let occlusionBox = ModelEntity(mesh: occlusionBoxMesh, materials: [OcclusionMaterial()])
+        let occlusionBox = ModelEntity(mesh: occlusionBoxMesh, materials: [material])
         occlusionBox.position.y = -boxSize/2
         anchor.addChild(occlusionBox)
+        
         
         var cancellable: AnyCancellable? = nil
         
