@@ -15,7 +15,7 @@ import SpriteKit
 class ViewController: UIViewController, ARSessionDelegate {
     
     @IBOutlet var arView: ARView!
-    var anchor = AnchorEntity()
+    var anchor: AnchorEntity? = nil
     var cards: [Entity] = []
     
     override func viewDidLoad() {
@@ -23,7 +23,8 @@ class ViewController: UIViewController, ARSessionDelegate {
         
         arView.session.delegate = self
         
-        /* Face Anchor
+        /*
+         //Face Anchor
         // Verify if your device supports FaceTrackingConfiguration (front camera) and then run the config
         guard ARFaceTrackingConfiguration.isSupported else { return }
         let configuration = ARFaceTrackingConfiguration()
@@ -33,35 +34,36 @@ class ViewController: UIViewController, ARSessionDelegate {
 
         // Add your face anchors to the scene
         
-        let anchor = AnchorEntity(.face) /// muda o tipo de ancoragem
-        arView.scene.addAnchor(anchor)
+        self.anchor = AnchorEntity(.face) /// muda o tipo de ancoragem
+        arView.scene.addAnchor(anchor!)
+         buildBoard()
         
         */
         
-        for _ in 1...16 {
-            let box = MeshResource.generateBox(width: 0.04, height: 0.002, depth: 0.04) // cria o volume
-            let metalMaterial = SimpleMaterial(color: .gray, isMetallic: true) //ficar metalico
-            let model = ModelEntity(mesh: box, materials: [metalMaterial]) //cria entidade
-            
-            model.generateCollisionShapes(recursive: true) //poder tocar
-            cards.append(model)
-        }
         
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
+         
+        //Horizontal Anchor
+         
+         self.anchor = AnchorEntity(plane: .horizontal)
+         arView.scene.addAnchor(anchor!)
+         buildBoard()
+         
         
-        let configuration = ARWorldTrackingConfiguration()
-        guard let referenceObjects = ARReferenceObject.referenceObjects(inGroupNamed: "scan", bundle: Bundle.main) else {
-            fatalError("Missing expected asset catalog resources.")
-        }
-        configuration.detectionObjects = referenceObjects
+        /*
+         //Object Anchor
+         
+         let configuration = ARWorldTrackingConfiguration()
+         guard let referenceObjects = ARReferenceObject.referenceObjects(inGroupNamed: "scan", bundle: Bundle.main) else {
+             fatalError("Missing expected asset catalog resources.")
+         }
+         configuration.detectionObjects = referenceObjects
 
-        arView.session.run(configuration)
+         arView.session.run(configuration)
+         
+         */
         
     }
-    
+  
     @IBAction func onTap(_ sender: UITapGestureRecognizer) {
         let tapLocation = sender.location(in: arView)
         if let card = arView.entity(at: tapLocation) {
@@ -86,25 +88,38 @@ class ViewController: UIViewController, ARSessionDelegate {
         card.move(to: flipDownTransform, relativeTo: card.parent, duration: 0.25, timingFunction: .easeInOut)
     }
     
+    /*
     func session(_ session: ARSession, didAdd anchors: [ARAnchor]) {
-        print("I've found the anchorrr")
-
+        
         if let newAnchor = anchors.last{
-            let anchor = AnchorEntity(anchor: newAnchor)
-            arView.scene.addAnchor(anchor)
-            self.anchor = anchor
-            foundAnchor(anchor: self.anchor)
+            self.anchor = AnchorEntity(anchor: newAnchor)
+            arView.scene.addAnchor(self.anchor!)
+            buildBoard()
         }
     }
+    */
     
-    func foundAnchor(anchor: AnchorEntity){
+    func buildBoard(){
+        
+        guard let anchor = self.anchor else{
+             return
+        }
+        
+        for _ in 1...16 {
+            let box = MeshResource.generateBox(width: 0.04, height: 0.002, depth: 0.04) // cria o volume
+            let metalMaterial = SimpleMaterial(color: .gray, isMetallic: true) //ficar metalico
+            let model = ModelEntity(mesh: box, materials: [metalMaterial]) //cria entidade
+            
+            model.generateCollisionShapes(recursive: true) //cria o shape
+            cards.append(model)
+        }
         
         for (index, card) in cards.enumerated() {
             let x = Float(index % 4) - 1.5
             let z = Float(index / 4) - 1.5
             
             card.position = [x * 0.1, 0, z * 0.1]
-            self.anchor.addChild(card)
+            anchor.addChild(card)
         }
 
         let boxSize: Float = 0.7
@@ -113,7 +128,7 @@ class ViewController: UIViewController, ARSessionDelegate {
         occlusionBox.position.y = -boxSize/2
 
         occlusionBox.name = "occlusion"
-        self.anchor.addChild(occlusionBox)
+        anchor.addChild(occlusionBox)
         
         var cancellable: AnyCancellable? = nil
         
