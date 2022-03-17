@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2EB887FC27DF8E0400CCA78E /* 03.usdz in Resources */ = {isa = PBXBuildFile; fileRef = 2EB887FB27DF8E0400CCA78E /* 03.usdz */; };
 		A20CD53527E12FB7000207AB /* ModelComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20CD53427E12FB7000207AB /* ModelComponent.swift */; };
 		E835740F27D8E20E00A87999 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E835740E27D8E20E00A87999 /* AppDelegate.swift */; };
 		E835741127D8E20E00A87999 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E835741027D8E20E00A87999 /* ViewController.swift */; };
@@ -19,12 +20,12 @@
 		E835742E27D8EC0B00A87999 /* 06.usdz in Resources */ = {isa = PBXBuildFile; fileRef = E835742427D8EC0A00A87999 /* 06.usdz */; };
 		E835742F27D8EC0B00A87999 /* 08.usdz in Resources */ = {isa = PBXBuildFile; fileRef = E835742527D8EC0A00A87999 /* 08.usdz */; };
 		E835743027D8EC0B00A87999 /* 09.usdz in Resources */ = {isa = PBXBuildFile; fileRef = E835742627D8EC0B00A87999 /* 09.usdz */; };
-		E835743127D8EC0B00A87999 /* 03.usdz in Resources */ = {isa = PBXBuildFile; fileRef = E835742727D8EC0B00A87999 /* 03.usdz */; };
 		E835743427D8EC0B00A87999 /* 07.usdz in Resources */ = {isa = PBXBuildFile; fileRef = E835742A27D8EC0B00A87999 /* 07.usdz */; };
 		E835743627D8EC4900A87999 /* 02.usdz in Resources */ = {isa = PBXBuildFile; fileRef = E835743527D8EC4900A87999 /* 02.usdz */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		2EB887FB27DF8E0400CCA78E /* 03.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = 03.usdz; sourceTree = "<group>"; };
 		A20CD53427E12FB7000207AB /* ModelComponent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelComponent.swift; sourceTree = "<group>"; };
 		E835740B27D8E20E00A87999 /* PairsAR.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PairsAR.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E835740E27D8E20E00A87999 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -38,7 +39,6 @@
 		E835742427D8EC0A00A87999 /* 06.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = 06.usdz; sourceTree = "<group>"; };
 		E835742527D8EC0A00A87999 /* 08.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = 08.usdz; sourceTree = "<group>"; };
 		E835742627D8EC0B00A87999 /* 09.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = 09.usdz; sourceTree = "<group>"; };
-		E835742727D8EC0B00A87999 /* 03.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = 03.usdz; sourceTree = "<group>"; };
 		E835742A27D8EC0B00A87999 /* 07.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = 07.usdz; sourceTree = "<group>"; };
 		E835743527D8EC4900A87999 /* 02.usdz */ = {isa = PBXFileReference; lastKnownFileType = file.usdz; path = 02.usdz; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -78,12 +78,12 @@
 				E835741027D8E20E00A87999 /* ViewController.swift */,
 				E835741427D8E20E00A87999 /* Main.storyboard */,
 				E835742327D8EC0A00A87999 /* 01.usdz */,
-				E835743527D8EC4900A87999 /* 02.usdz */,
-				E835742727D8EC0B00A87999 /* 03.usdz */,
+				2EB887FB27DF8E0400CCA78E /* 03.usdz */,
 				E835742127D8EC0A00A87999 /* 04.usdz */,
 				E835742227D8EC0A00A87999 /* 05.usdz */,
 				E835742427D8EC0A00A87999 /* 06.usdz */,
 				E835742A27D8EC0B00A87999 /* 07.usdz */,
+				E835743527D8EC4900A87999 /* 02.usdz */,
 				E835742527D8EC0A00A87999 /* 08.usdz */,
 				E835742627D8EC0B00A87999 /* 09.usdz */,
 				E835741727D8E21000A87999 /* Assets.xcassets */,
@@ -158,8 +158,8 @@
 				E835742D27D8EC0B00A87999 /* 01.usdz in Resources */,
 				E835742F27D8EC0B00A87999 /* 08.usdz in Resources */,
 				E835741627D8E20E00A87999 /* Main.storyboard in Resources */,
-				E835743127D8EC0B00A87999 /* 03.usdz in Resources */,
 				E835742B27D8EC0B00A87999 /* 04.usdz in Resources */,
+				2EB887FC27DF8E0400CCA78E /* 03.usdz in Resources */,
 				E835742C27D8EC0B00A87999 /* 05.usdz in Resources */,
 				E835742E27D8EC0B00A87999 /* 06.usdz in Resources */,
 			);
