@@ -37,8 +37,8 @@ class ViewController: UIViewController, ARSessionDelegate {
         self.anchor = AnchorEntity(.face) /// muda o tipo de ancoragem
         arView.scene.addAnchor(anchor!)
          buildBoard()
-        
         */
+        
         
         
          
@@ -48,6 +48,7 @@ class ViewController: UIViewController, ARSessionDelegate {
          arView.scene.addAnchor(anchor!)
          buildBoard()
          
+        
         
         /*
          //Object Anchor
@@ -61,43 +62,7 @@ class ViewController: UIViewController, ARSessionDelegate {
          arView.session.run(configuration)
          
          */
-        
     }
-  
-    @IBAction func onTap(_ sender: UITapGestureRecognizer) {
-        let tapLocation = sender.location(in: arView)
-        if let card = arView.entity(at: tapLocation) {
-            
-            if card.transform.rotation.angle == .pi {
-                flipDownCard(card: card)
-            } else {
-                flipUpCard(card: card)
-            }
-        }
-    }
-    
-
-    func flipUpCard(card: Entity){
-        var flipUpTransform = card.transform
-        flipUpTransform.rotation = simd_quatf(angle: .pi, axis: [1, 0, 0])
-        card.move(to: flipUpTransform, relativeTo: card.parent, duration: 0.25, timingFunction: .easeInOut)
-    }
-    func flipDownCard(card: Entity){
-        var flipDownTransform = card.transform
-        flipDownTransform.rotation = simd_quatf(angle: 0, axis: [1, 0, 0])
-        card.move(to: flipDownTransform, relativeTo: card.parent, duration: 0.25, timingFunction: .easeInOut)
-    }
-    
-    /*
-    func session(_ session: ARSession, didAdd anchors: [ARAnchor]) {
-        
-        if let newAnchor = anchors.last{
-            self.anchor = AnchorEntity(anchor: newAnchor)
-            arView.scene.addAnchor(self.anchor!)
-            buildBoard()
-        }
-    }
-    */
     
     func buildBoard(){
         
@@ -163,10 +128,45 @@ class ViewController: UIViewController, ARSessionDelegate {
                     self.cards[index].name = "card" + String(index)
                     self.cards[index].addChild(object)
                     self.cards[index].transform.rotation = simd_quatf(angle: .pi, axis: [1, 0, 0])
-                }
+            }
                 cancellable?.cancel()
-            })
+        })
+    }
+    
+    @IBAction func onTap(_ sender: UITapGestureRecognizer) {
+        let tapLocation = sender.location(in: arView)
+        if let card = arView.entity(at: tapLocation) {
+            
+            if card.transform.rotation.angle == .pi {
+                flipDownCard(card: card)
+            } else {
+                flipUpCard(card: card)
+            }
         }
+    }
+
+    func flipUpCard(card: Entity){
+        var flipUpTransform = card.transform
+        flipUpTransform.rotation = simd_quatf(angle: .pi, axis: [1, 0, 0])
+        card.move(to: flipUpTransform, relativeTo: card.parent, duration: 0.25, timingFunction: .easeInOut)
+    }
+    
+    func flipDownCard(card: Entity){
+        var flipDownTransform = card.transform
+        flipDownTransform.rotation = simd_quatf(angle: 0, axis: [1, 0, 0])
+        card.move(to: flipDownTransform, relativeTo: card.parent, duration: 0.25, timingFunction: .easeInOut)
+    }
+    
+    /*
+    func session(_ session: ARSession, didAdd anchors: [ARAnchor]) {
+        
+        if let newAnchor = anchors.last{
+            self.anchor = AnchorEntity(anchor: newAnchor)
+            arView.scene.addAnchor(self.anchor!)
+            buildBoard()
+        }
+    }
+    */
     
 }
 
