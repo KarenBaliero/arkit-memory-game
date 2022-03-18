@@ -89,14 +89,14 @@ class ViewController: UIViewController, ARSessionDelegate {
             card.position = [x * 0.1, 0, z * 0.1]
             anchor.addChild(card)
             
-            let material = OcclusionMaterial()
-            let boxSize: Float = -0.004
-            let occlusionBoxMesh = MeshResource.generateBox(size: boxSize)
-            let occlusionBox = ModelEntity(mesh: occlusionBoxMesh, materials: [material])
-            occlusionBox.position.y = -boxSize
-            occlusionBox.position.x = x*0.1
-            occlusionBox.position.z = z*0.1
-            anchor.addChild(occlusionBox)
+//            let material = OcclusionMaterial()
+//            let boxSize: Float = -0.004
+//            let occlusionBoxMesh = MeshResource.generateBox(size: boxSize)
+//            let occlusionBox = ModelEntity(mesh: occlusionBoxMesh, materials: [material])
+//            occlusionBox.position.y = -boxSize
+//            occlusionBox.position.x = x*0.1
+//            occlusionBox.position.z = z*0.1
+//            anchor.addChild(occlusionBox)
         }
         
         let material = OcclusionMaterial()
